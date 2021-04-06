@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 if (isset($_GET['invalidate'])) {
     opcache_invalidate($_GET['invalidate'], true);
     header('Location: ' . $_SERVER['PHP_SELF'].'#scripts');
@@ -22,7 +23,7 @@ $status = opcache_get_status();
  * Turn bytes into a human readable format
  * @param $bytes
  */
-function size_for_humans($bytes)
+function size_for_humans($bytes): string
 {
     if ($bytes > 1048576) {
         return sprintf("%.2f&nbsp;MB", $bytes/1048576);
@@ -33,28 +34,25 @@ function size_for_humans($bytes)
     }
 }
 
-function getOffsetWhereStringsAreEqual($a, $b)
+function getOffsetWhereStringsAreEqual($a, $b): int
 {
     $i = 0;
-    while (strlen($a) && strlen($b) && strlen($a) > $i && $a{$i} === $b{$i}) {
+    while (strlen($a) && strlen($b) && strlen($a) > $i && $a[$i] === $b[$i]) {
         $i++;
     }
 
     return $i;
 }
 
-function getSuggestionMessage($property, $value)
+function getSuggestionMessage($property, $value): string
 {
     switch ($property) {
         case 'opcache_enabled':
             return $value ? '' : '<span class="glyphicon glyphicon-search"></span> You should enabled opcache';
-            break;
         case 'cache_full':
             return $value ? '<span class="glyphicon glyphicon-search"></span> You should increase opcache.memory_consumption' : '';
-            break;
         case 'opcache.validate_timestamps':
             return $value ? '<span class="glyphicon glyphicon-search"></span> If you are in a production environment you should disabled it' : '';
-            break;
     }
 
     return '';
@@ -76,14 +74,11 @@ function getStringFromPropertyAndValue($property, $value)
         case 'wasted_memory':
         case 'opcache.memory_consumption':
             return size_for_humans($value);
-            break;
         case 'current_wasted_percentage':
         case 'opcache_hit_rate':
             return number_format($value, 2).'%';
-            break;
         case 'blacklist_miss_ratio':
             return number_format($value, 2);
-            break;
     }
 
     return $value;
